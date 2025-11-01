@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rajasthani Intro</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Baloo+2:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&family=Amiri:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --maroon: #6e0b0b; /* deep maroon */
+      --accent: #ffd88c;
+      --transition: 700ms;
+    }
+
+    html,body{height:100%;margin:0}
+    body{
+      background: var(--maroon);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;align-items:center;justify-content:center;
+      font-family: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: white;
+    }
+
+    .wrap{
+      text-align:center;
+      padding:32px;
+      max-width:960px;
+      width:100%;
+    }
+
+    .name {
+      display:inline-block;
+      font-size: clamp(2.4rem, 8vw, 6rem);
+      line-height:1;
+      padding: 0.25em 0.6em;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(0,0,0,0.04));
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35) inset;
+      transition: transform var(--transition) ease, opacity var(--transition) ease;
+      cursor: default;
+      will-change: transform, opacity;
+      user-select: none;
+    }
+
+    /* font classes */
+    .f-english{ font-family: "Roboto", system-ui, Arial, sans-serif; }
+    .f-hindi{ font-family: "Noto Sans Devanagari", "Baloo 2", system-ui, sans-serif; }
+    .f-marwadi{ font-family: "Baloo 2", "Noto Sans Devanagari", system-ui, sans-serif; }
+    .f-urdu{ font-family: "Amiri", serif; font-style: italic; }
+
+    /* subtle entrance/exit */
+    .fade-out{ opacity:0; transform: translateY(-8px) scale(0.98); }
+    .fade-in{ opacity:1; transform: translateY(0) scale(1); }
+
+    /* small helper text */
+    .hint{
+      margin-top:18px;
+      color: rgba(255,255,255,0.85);
+      font-size:0.95rem;
+      opacity:0.9;
+    }
+
+    .controls{ margin-top:18px; display:flex; gap:12px; justify-content:center; }
+    .btn{
+      background:transparent;border:1px solid rgba(255,255,255,0.12); padding:8px 14px; border-radius:8px; color:inherit; backdrop-filter: blur(4px);
+      cursor:pointer; font-size:0.95rem;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    @media (max-width:520px){ .hint{ font-size:0.86rem } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="name" class="name f-english fade-in">Abhinandna Vaidya</div>
+
+    <div class="controls">
+      <button id="pauseBtn" class="btn">Pause</button>
+      <button id="prevBtn" class="btn">Prev</button>
+      <button id="nextBtn" class="btn">Next</button>
+    </div>
+
+    <div class="hint">Rajasthani-themed intro — backgrounds, fonts cycle through English, Hindi, Marwadi (Devanagari style), and Urdu script. Click 'Pause' to stop.</div>
+  </div>
+
+  <script>
+    /* --- CONFIG: edit these values if you want --- */
+    const cycleDelay = 2800; // ms between switches
+
+    // The name variants. You can edit the strings if you prefer different spellings.
+    const variants = [
+      {text: 'Abhinandna Vaidya', cls: 'f-english'},
+      {text: 'अभिनंदना वैद्य', cls: 'f-hindi'},
+      {text: 'अभिनंदना वैद्य', cls: 'f-marwadi'}, // Marwadi generally uses Devanagari; use a decorative Devanagari font
+      {text: 'ابھینندنا ویدیا', cls: 'f-urdu'}
+    ];
+
+    /* --- Implementation --- */
+    const el = document.getElementById('name');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let idx = 0;
+    let timer = null;
+    let paused = false;
+
+    function showVariant(i){
+      const v = variants[(i+variants.length)%variants.length];
+      // fade out
+      el.classList.remove('fade-in');
+      el.classList.add('fade-out');
+      // after transition, change text & font
+      setTimeout(()=>{
+        el.textContent = v.text;
+        el.className = `name ${v.cls} fade-in`;
+      }, 260);
+    }
+
+    function startCycle(){
+      stopCycle();
+      timer = setInterval(()=>{
+        idx = (idx + 1) % variants.length;
+        showVariant(idx);
+      }, cycleDelay);
+      paused = false;
+      pauseBtn.textContent = 'Pause';
+    }
+
+    function stopCycle(){
+      if(timer) clearInterval(timer);
+      timer = null;
+      paused = true;
+      pauseBtn.textContent = 'Resume';
+    }
+
+    pauseBtn.addEventListener('click', ()=>{
+      if(paused) startCycle(); else stopCycle();
+    });
+
+    prevBtn.addEventListener('click', ()=>{
+      idx = (idx - 1 + variants.length) % variants.length;
+      showVariant(idx);
+    });
+    nextBtn.addEventListener('click', ()=>{
+      idx = (idx + 1) % variants.length;
+      showVariant(idx);
+    });
+
+    // pause on hover (optional) - comment out if not wanted
+    el.addEventListener('mouseenter', ()=>{ stopCycle(); });
+    el.addEventListener('mouseleave', ()=>{ if(!paused) startCycle(); });
+
+    // initialize
+    showVariant(0);
+    startCycle();
+
+    // Accessibility: keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === ' '){ e.preventDefault(); pauseBtn.click(); }
+      if(e.key === 'ArrowRight') nextBtn.click();
+      if(e.key === 'ArrowLeft') prevBtn.click();
+    });
+  </script>
+</body>
+</html>
