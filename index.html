@@ -59,7 +59,7 @@
       setTimeout(()=>{
         el.textContent = v.text;
         el.className = `name ${v.cls} fade-in`;
-      }, 300);
+      }, 200);
     }
 
     function cycleFonts(){
@@ -67,8 +67,8 @@
       showVariant(idx);
     }
 
-    // Automatically cycle every 2.5 seconds
-    setInterval(cycleFonts, 2500);
+    // Automatically cycle every 1.5 seconds
+    setInterval(cycleFonts, 400);
   </script>
 </body>
 </html>
